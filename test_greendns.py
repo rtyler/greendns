@@ -29,6 +29,9 @@ class GetFQDNTests(unittest.TestCase):
 class GetAddrInfoTests(unittest.TestCase):
     def runTest(self):
         original = socket.getaddrinfo('www.python.org', 80, 0, 0, socket.SOL_TCP)
+        if not socket.has_ipv6:
+            ## Filter AF_INET6
+            original = [f for f in original if not f[0] == socket.AF_INET6]
         new = greendns.getaddrinfo('www.python.org', 80, 0, 0, socket.SOL_TCP)
         self.assertEquals(new, original)
 

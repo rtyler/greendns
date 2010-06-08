@@ -4,23 +4,46 @@ import random
 import socket
 import sys
 
+import dns.ipv6
 import dns.resolver
 import dns.reversename
 
-def _gethostsbyname(name):
-    for rdata in dns.resolver.query(name, 'A'):
+def _records(name, mode):
+    for rdata in dns.resolver.query(name, mode):
         yield rdata.address
+
+def _Arecords(name):
+    return _records(name, 'A')
+
+def _AAAArecords(name):
+    return _records(name, 'AAAA')
 
 def gethostbyname(name):
     ## NOTE: Still not entirely sure how `socket.gethostbyname`
     ## returns a single A record for an address with multiple records
-    return random.choice(list(_gethostsbyname(name)))
+    return random.choice(list(_Arecords(name)))
 
 def gethostbyname_ex(name):
-    return (name, [], list(_gethostsbyname(name)))
+    return (name, [], list(_Arecords(name)))
 
 def getaddrinfo(host, port, family=0, socktype=0, proto=0, flags=0):
-    pass
+    info = []
+    socktype = socktype or socket.SOCK_STREAM
+    proto = proto or socket.IPPROTO_TCP
+
+    if family == 0 or family == socket.AF_INET:
+        for record in _Arecords(host):
+            entry = (socket.AF_INET, socktype, proto, '', (record, port))
+            info.append(entry)
+
+    if not socket.has_ipv6 or not family == socket.AF_INET6:
+        return info
+
+    for record in _AAAArecords(host):
+        entry = (socket.AF_INET6, socktype, proto, '', (record, port))
+        info.append(entry)
+
+    return info
 
 def getfqdn(name=None):
     if name is None:
@@ -41,7 +64,7 @@ def gethostbyaddr(address):
         return (name, [], [address])
 
 _monkeypatchable = ('gethostbyname', 'gethostbyname_ex',
-        'gethostbyaddr',)
+        'gethostbyaddr', 'getaddrinfo', 'getfqdn',)
 _monkeypatched = None
 
 def monkeypatch():
