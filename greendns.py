@@ -23,7 +23,12 @@ def getaddrinfo(host, port, family=0, socktype=0, proto=0, flags=0):
     pass
 
 def getfqdn(name=None):
-    pass
+    if name is None:
+        return None
+    host = gethostbyname(name)
+    entry = gethostbyaddr(host)
+    if entry and entry[0]:
+        return entry[0]
 
 def gethostbyaddr(address):
     name = dns.reversename.from_address(address)
@@ -35,7 +40,8 @@ def gethostbyaddr(address):
         name = entry.to_text()[:-1]
         return (name, [], [address])
 
-_monkeypatchable = ('gethostbyname', 'gethostbyname_ex',)
+_monkeypatchable = ('gethostbyname', 'gethostbyname_ex',
+        'gethostbyaddr',)
 _monkeypatched = None
 
 def monkeypatch():

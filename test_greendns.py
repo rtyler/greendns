@@ -21,6 +21,11 @@ class GetFQDNTests(unittest.TestCase):
         new = greendns.getfqdn()
         self.assertEquals(new, original)
 
+    def test_eventletnet(self):
+        original = socket.getfqdn('eventlet.net')
+        new = greendns.getfqdn('eventlet.net')
+        self.assertEquals(new, original)
+
 class GetAddrInfoTests(unittest.TestCase):
     def runTest(self):
         original = socket.getaddrinfo('www.python.org', 80, 0, 0, socket.SOL_TCP)
