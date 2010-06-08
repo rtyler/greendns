@@ -11,6 +11,8 @@ def _gethostsbyname(name):
         yield rdata.address
 
 def gethostbyname(name):
+    ## NOTE: Still not entirely sure how `socket.gethostbyname`
+    ## returns a single A record for an address with multiple records
     return random.choice(list(_gethostsbyname(name)))
 
 def gethostbyname_ex(name):
