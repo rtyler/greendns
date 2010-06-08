@@ -5,6 +5,7 @@ import socket
 import sys
 
 import dns.resolver
+import dns.reversename
 
 def _gethostsbyname(name):
     for rdata in dns.resolver.query(name, 'A'):
@@ -25,7 +26,14 @@ def getfqdn(name=None):
     pass
 
 def gethostbyaddr(address):
-    pass
+    name = dns.reversename.from_address(address)
+    if not name:
+        return None
+
+    for entry in dns.resolver.query(name.to_text(), 'PTR'):
+        # Trim the trailing dot off the name
+        name = entry.to_text()[:-1]
+        return (name, [], [address])
 
 _monkeypatchable = ('gethostbyname', 'gethostbyname_ex',)
 _monkeypatched = None
