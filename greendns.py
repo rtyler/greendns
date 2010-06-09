@@ -77,8 +77,8 @@ _monkeypatchable = ('gethostbyname', 'gethostbyname_ex',
         'gethostbyaddr', 'getaddrinfo', 'getfqdn',)
 _monkeypatched = None
 
-def monkeypatch():
-    self = sys.modules[__name__]
+def monkeypatch(module=None):
+    self = module or sys.modules[__name__]
     global _monkeypatched
     _monkeypatched = {}
     for name in _monkeypatchable:
