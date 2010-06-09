@@ -31,6 +31,13 @@ def getaddrinfo(host, port, family=0, socktype=0, proto=0, flags=0):
     socktype = socktype or socket.SOCK_STREAM
     proto = proto or socket.IPPROTO_TCP
 
+    try:
+        # Check to see if this is really an IP address
+        family = dns.inet.af_for_address(host)
+        return [(family, socktype, proto, '', (host, port))]
+    except ValueError:
+        pass
+
     if family == 0 or family == socket.AF_INET:
         for record in _Arecords(host):
             entry = (socket.AF_INET, socktype, proto, '', (record, port))
