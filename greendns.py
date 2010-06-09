@@ -34,6 +34,9 @@ def getaddrinfo(host, port, family=0, socktype=0, proto=0, flags=0):
     socktype = socktype or socket.SOCK_STREAM
     proto = proto or socket.IPPROTO_TCP
 
+    if host == 'localhost':
+        host = '127.0.0.1'
+
     try:
         # Check to see if this is really an IP address
         family = dns.inet.af_for_address(host)
