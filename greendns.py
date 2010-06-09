@@ -4,6 +4,9 @@ import random
 import socket
 import sys
 
+if not hasattr(socket, '__patched__'):
+    sys.stderr.write('WARNING: greendns being imported without a monkey-patched socket module!\n')
+
 import dns.ipv6
 import dns.resolver
 import dns.reversename
